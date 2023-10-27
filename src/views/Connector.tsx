@@ -1,6 +1,9 @@
-import * as React from "react";
-
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import {
+	FormControl,
+	Input,
+	InputLabel,
 	Grid,
 	Paper,
 	Table,
@@ -9,9 +12,9 @@ import {
 	TableContainer,
 	TableHead,
 	TableRow,
-	TextField,
 } from "@mui/material";
 import { TableVirtuoso, TableComponents } from "react-virtuoso";
+import IpEntry from "components/IpEntry";
 
 interface Data {
 	bib: number;
@@ -24,6 +27,8 @@ interface Data {
 	chipStartSeconds: number;
 	actualStop: string;
 	actualStopSeconds: number;
+	chipStop: string;
+	chipStopSeconds: number;
 	channelAStart: string;
 	channelAStartSeconds: number;
 	channelAStop: string;
@@ -64,12 +69,6 @@ const raceDataColumn: ColumnData[] = [
 		width: 40,
 		label: "Act\u00A0Start",
 		dataKey: "actualStart",
-		numeric: true,
-	},
-	{
-		width: 40,
-		label: "Chip\u00A0Start",
-		dataKey: "chipStart",
 		numeric: true,
 	},
 	{
@@ -198,39 +197,77 @@ function channelDataRowContent(_index: number, row: Data) {
 	);
 }
 
-export default function ReactVirtualizedTable() {
+export default function Connector() {
+	const [rrAPI, setRrAPI] = useState<string>();
+	const [channelAConnected, setChannelAConnected] = useState<boolean>(false);
+	const [channelBConnected, setChannelBConnected] = useState<boolean>(false);
+	const [channelAIP, setChannelAIP] = useState<string>();
+	const [channelBIP, setChannelBIP] = useState<string>();
+	const [data, setData] = useState<Data[]>();
+
+	const connectToChannelA = () => {
+		if (channelAConnected) {
+			setChannelAConnected(false);
+		} else {
+			setChannelAConnected(true);
+		}
+	};
+
+	const connectToChannelB = () => {
+		if (channelBConnected) {
+			setChannelBConnected(false);
+		} else {
+			setChannelBConnected(true);
+		}
+	};
+
+	const handleChannelIPChange = (channel: string, ip: string) => {
+		if (channel === "A") {
+			setChannelAIP(ip);
+		} else {
+			setChannelBIP(ip);
+		}
+	};
+
+	useEffect(() => {
+		if (rrAPI) {
+			axios
+				.get(rrAPI)
+				.then(function (response) {
+					// handle success
+					console.log("response :>> ", response);
+					setData(response.data);
+				})
+				.catch(function (error) {
+					// handle error
+					console.log(error);
+				});
+		}
+	}, [rrAPI]);
+
 	return (
 		<Grid container direction="row" spacing={4}>
 			<Grid
-				item
+				alignItems="center"
 				direction="column"
+				display="flex"
+				item
 				justifyContent="flex-start"
-				alignItems="flex-start"
 				xs={8}
 			>
-				<Grid direction="row" item xs={2}>
-					<TextField
-						id="rrAPI"
-						InputLabelProps={{
-							shrink: true,
-						}}
-						label="r|r API"
-						sx={{ width: "75%" }}
+				<FormControl sx={{ m: 1, width: "100%" }} variant="standard">
+					<InputLabel htmlFor="channel">r|r API URL</InputLabel>
+					<Input
+						id="rrAPIURL"
+						onChange={(e) => setRrAPI(e.target.value)}
+						type="text"
+						value={rrAPI}
 					/>
-					<TextField
-						id="updateRate"
-						InputLabelProps={{
-							shrink: true,
-						}}
-						label="Update Rate (sec)"
-						sx={{ width: "25%" }}
-						type="number"
-					/>
-				</Grid>
-				<Grid item xs={12}>
+				</FormControl>
+				<Grid item width="100%">
 					<Paper style={{ height: 500, width: "100%" }}>
 						<TableVirtuoso
-							// data={rows}
+							data={data}
 							components={VirtuosoTableComponents}
 							fixedHeaderContent={raceDataHeaderContent}
 							itemContent={raceDataRowContent}
@@ -238,14 +275,13 @@ export default function ReactVirtualizedTable() {
 					</Paper>
 				</Grid>
 			</Grid>
-			<Grid direction="column" item xs={2}>
-				<TextField
-					id="aChannelIP"
-					InputLabelProps={{
-						shrink: true,
-					}}
-					label="A Channel IP"
-					sx={{ width: "100%" }}
+			<Grid alignItems="center" display="flex" direction="column" item xs={2}>
+				<IpEntry
+					channel="A"
+					channelConnected={channelAConnected}
+					connectToChannel={connectToChannelA}
+					onChange={handleChannelIPChange}
+					value={channelAIP}
 				/>
 				<Paper style={{ height: 500, width: "100%" }}>
 					<TableVirtuoso
@@ -256,14 +292,13 @@ export default function ReactVirtualizedTable() {
 					/>
 				</Paper>
 			</Grid>
-			<Grid direction="column" item xs={2}>
-				<TextField
-					id="bChannelIP"
-					InputLabelProps={{
-						shrink: true,
-					}}
-					label="B Channel IP"
-					sx={{ width: "100%" }}
+			<Grid alignItems="center" display="flex" direction="column" item xs={2}>
+				<IpEntry
+					channel="B"
+					channelConnected={channelBConnected}
+					connectToChannel={connectToChannelB}
+					onChange={handleChannelIPChange}
+					value={channelBIP}
 				/>
 				<Paper style={{ height: 500, width: "100%" }}>
 					<TableVirtuoso
