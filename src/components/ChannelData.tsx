@@ -112,7 +112,7 @@ const ChannelData: React.FC<ChannelDataProps> = (props) => {
 	const connectToServer = () => {
 		// opening a connection to the server to begin receiving events from it
 		channelEventSource = new EventSource(
-			`http://localhost:3300/listen?ipAddr=${channelIP}&port=8234`
+			`http://localhost:${channel === "A" ? "3300" : "3301"}/listen`
 		);
 		// attaching a handler to receive message events
 		channelEventSource.onmessage = (event: any) => {
