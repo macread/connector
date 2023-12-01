@@ -25,3 +25,9 @@ export interface IRacerData {
 export interface ITimyData {
 	timyTime: string;
 };
+
+export interface ITimingData{
+	source: string;
+	time: string;
+	timeInSeconds: number;
+};

@@ -1,13 +1,12 @@
 import React from "react";
-import {
-	FormControl,
-	IconButton,
-	Input,
-	InputAdornment,
-	InputLabel,
-} from "@mui/material";
-import { LinkOffOutlined, LinkOutlined } from "@mui/icons-material";
-
+import FormControl from "@mui/material/FormControl";
+import IconButton from "@mui/material/IconButton";
+import Input from "@mui/material/Input";
+import InputAdornment from "@mui/material/InputAdornment";
+import InputLabel from "@mui/material/InputLabel";
+import LinkOffOutlined from "@mui/icons-material/LinkOffOutlined";
+import LinkOutlined from "@mui/icons-material/LinkOutlined";
+import ReloadPicker from "./ReloadPicker";
 interface IpEntryProps {
 	channel: string;
 	channelConnected: boolean;
@@ -42,6 +41,7 @@ const IpEntry: React.FC<IpEntryProps> = (props: IpEntryProps) => {
 								<LinkOffOutlined fontSize="small" />
 							)}
 						</IconButton>
+						<ReloadPicker channel={channel} />
 					</InputAdornment>
 				}
 				onChange={(e) => onChange(channel, e.target.value)}

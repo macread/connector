@@ -89,7 +89,7 @@ const RaceDataTableComponents: TableComponents<IRacerData> = {
 		/>
 	),
 	TableHead,
-	TableRow: ({ item: _item, ...props }) => <TableRow {...props} />,
+	TableRow: ({ item: _item, ...props }) => <TableRow {...props} hover />,
 	TableBody: React.forwardRef<HTMLTableSectionElement>((props, ref) => (
 		<TableBody {...props} ref={ref} />
 	)),
